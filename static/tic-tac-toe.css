@@ -1,0 +1,66 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: left;
+}
+span.board-text {
+    font-family: Arial, sans-serif;
+    font-size: 64pt;
+}
+span.hilite-board-text {
+    font-family: Arial, sans-serif;
+    font-size: 64pt;
+    color: red;
+}
+div.center {
+    width:100%;
+    text-align:center;
+    align-items: center;
+}
+td {
+    border: 8px solid transparent;
+}
+td.board-lr-cell{
+    width: 80px;
+    border-bottom-color: black;
+    border-right-color: black;            
+}
+td.board-l-cell{
+    width: 80px;
+    border-bottom-color: black;            
+}
+td.board-r-cell{
+    width: 80px;
+    border-right-color: black;            
+}
+td.board-no-cell{
+    width: 80px;
+}
+.blue-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3498db; /* Blue color */
+    color: #fff; /* White text color */
+    text-decoration: none; /* Remove underline from link */
+    border-radius: 5px; /* Optional: Add rounded corners */
+}
+.game-select-button {
+    display: inline-block;
+    font-size: 16pt;
+    width: 180px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    background-color: #129a26; /* Green color */
+    color: #fff; /* White text color */
+    text-decoration: none; /* Remove underline from link */
+    border-radius: 5px; /* Optional: Add rounded corners */
+}
+.clear-link {
+    display: inline-block;
+    background-color: transparent; 
+    color: transparent;
+    text-decoration: none; /* Remove underline from link */
+}
+.center {
+    margin-left: auto;
+    margin-right: auto;
+}

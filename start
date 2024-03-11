@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Used with the reload option not intended for production
+export WATCHFILES_FORCE_POLLING=true
+
+# remove the reload option for production
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
