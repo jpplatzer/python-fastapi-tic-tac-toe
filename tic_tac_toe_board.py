@@ -30,6 +30,9 @@ class Tic_Tac_Toe_Board:
         self.__board = [self.empty_square for i in range(self.__num_squares)]
         self.__highlight = [False for i in range(self.__num_squares)]
 
+    def num_squares():
+        return Tic_Tac_Toe_Board.__num_squares
+
     def find_line(self, find_fcn):
         # Find horizontal lines
         step = 1
@@ -85,8 +88,7 @@ class Tic_Tac_Toe_Board:
     
     def __empty_cell_content(self, idx, active):
         if active:
-            link = api_tools.make_url_with_value(self.__move_link, self.__game_id)
-            link = api_tools.make_url_with_value(link, idx)
+            link = api_tools.make_url_with_value(self.__move_link, idx)
             href = " href=\"" + link + "\""
         else:
             href = ""

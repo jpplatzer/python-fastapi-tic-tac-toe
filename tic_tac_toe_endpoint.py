@@ -14,7 +14,6 @@ setup_link_one = tic_tac_toe_link + "/setup_one"
 setup_link_two = tic_tac_toe_link + "/setup_two"
 start_link = tic_tac_toe_link + "/start"
 play_link = tic_tac_toe_link + "/play"
-move_link = tic_tac_toe_link + "/move"
 replay_link = tic_tac_toe_link + "/replay"
 end_link = tic_tac_toe_link + "/end"
 
@@ -67,13 +66,15 @@ def setup_two_content():
 def __start_tic_tac_toe():
     return api_tools.create_response_page(setup_two_content())
 
-def __redirect_to_play_response(game):
+def __redirect_to_begin_play_response(game):
     play_url = api_tools.make_url_with_value(play_link, game.game_id())
+    play_url = api_tools.make_url_with_value(play_url, Ttt_Game.begin_game_position())
     return RedirectResponse(play_url)
 
 def __create_new_game(players):
     game_id = game_mgr.get_new_game_id()
-    game = Ttt_Game(players, game_id, move_link)
+    move_url = api_tools.make_url_with_value(play_link, game_id)
+    game = Ttt_Game(players, game_id, move_url)
     game_mgr.set_game(game, game_id)
     return game
 
@@ -91,7 +92,7 @@ def __tic_tac_toe_page(name1: str, name2: str, auto: str):
     player2 = TicTacToePlayer(p2_name, TicTacToePlayer.o_role, 1, auto2)
     players = [player1, player2]
     game = __create_new_game(players)
-    return __redirect_to_play_response(game)
+    return __redirect_to_begin_play_response(game)
 
 def __game_control_button_content(game_id):
     replay_game_link = api_tools.make_url_with_value(replay_link, game_id)
@@ -103,7 +104,7 @@ def __game_control_button_content(game_id):
 def __game_content(game):
     player = game.current_player()
     players = game.players()
-    move_url = api_tools.make_url_with_value(move_link, game.game_id())
+    move_url = api_tools.make_url_with_value(play_link, game.game_id())
     content = """
         <div class="center">
         <p><h1>Tic-Tac-Toe!<br></h1></p>
@@ -134,22 +135,15 @@ def __invalid_game_content():
 def __invalid_game_response():
     return api_tools.create_response_page(__invalid_game_content())
 
-@router.get(api_tools.make_url_with_value(play_link, "{game_id}"))
-def __tic_tac_toe_play(game_id: int):
+@router.get(api_tools.make_url_with_value(play_link, "{game_id}/{position}"))
+def __tic_tac_toe_play(game_id: int, position: int):
     game = game_mgr.get_game(Ttt_Game.game_name(), game_id)
-    if game != None and game.current_player().is_auto():
-        game.make_auto_move(game.current_player())
-    content = __game_content(game) if game != None else __invalid_game_content()
+    if game == None:
+        content = __invalid_game_content()
+    else:    
+        game.make_move(position)
+        content = __game_content(game)
     return api_tools.create_response_page(content)
-
-@router.get(api_tools.make_url_with_value(move_link, "{game_id}/{position}"))
-def __tic_tac_toe_move(game_id: int, position: int):
-    game = game_mgr.get_game(Ttt_Game.game_name(), game_id)
-    if game == None: return __invalid_game_response()
-    game.make_move(position)
-    if game.current_player().is_auto():
-        game.make_auto_move(game.current_player())
-    return api_tools.create_response_page(__game_content(game))
 
 @router.get(api_tools.make_url_with_value(replay_link, "{game_id}"))
 def __tic_tac_toe_replay(game_id: int):
@@ -157,7 +151,7 @@ def __tic_tac_toe_replay(game_id: int):
     if game == None: return __invalid_game_response()
     new_game = __create_new_game(game.players())
     game_mgr.del_game(game_id)
-    return __redirect_to_play_response(new_game)
+    return __redirect_to_begin_play_response(new_game)
 
 @router.get(api_tools.make_url_with_value(end_link, "{game_id}"))
 def __tic_tac_toe_end(game_id: int):
@@ -165,5 +159,4 @@ def __tic_tac_toe_end(game_id: int):
     if game == None:
         game_mgr.del_game(game_id)
     return RedirectResponse(api_tools.home_url())
-
 
