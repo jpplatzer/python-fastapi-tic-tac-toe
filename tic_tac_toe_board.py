@@ -99,14 +99,14 @@ class Tic_Tac_Toe_Board:
             self.__highlight[i] = True
 
     def make_move(self, position, square_value) -> MoveStatus:
-        status: Tic_Tac_Toe_Board.MoveStatus = self.MoveStatus.VALID
+        status = self.MoveStatus.VALID
         if position not in range(self.__num_squares) or self.__board[position] != self.empty_square:
             return self.MoveStatus.INVALID
         self.__board[position] = square_value
-        line_parms = self.find_line(Tic_Tac_Toe_Board.is_line)
-        if line_parms != None:
+        line_params = self.find_line(Tic_Tac_Toe_Board.is_line)
+        if line_params != None:
             status = self.MoveStatus.WON
-            self.__set_highlight(line_parms[0], line_parms[1])
+            self.__set_highlight(line_params[0], line_params[1])
         elif all(square != Tic_Tac_Toe_Board.empty_square \
             for square in self.__board):
             status = self.MoveStatus.DRAW
@@ -116,48 +116,53 @@ class Tic_Tac_Toe_Board:
 
     def auto_move_position(self, square_value) -> int | None:
         position = None
-        empties = [i for i in range(self.__num_squares)\
-            if self.__board[i] == Tic_Tac_Toe_Board.empty_square]
-        num_moves = self.__num_squares - len(empties)
+        num_moves = sum(1 for square in self.__board \
+            if square != Tic_Tac_Toe_Board.empty_square)
         if num_moves == self.__num_squares: return None
+        # Pick anything on the first move to keep it interesting
         if num_moves == 0: return random.randint(0, self.__num_squares - 1)
-        if self.__board[4] == Tic_Tac_Toe_Board.empty_square: return 4 
-        position = self.get_best_next_auto_position(empties, square_value)
+        # Pick the middle when available
+        if self.__board[4] == Tic_Tac_Toe_Board.empty_square: return 4
+        # Otherwise do a bit more work to pick the next position
+        position = self.get_best_next_auto_position(square_value)
         return position
     
-    def get_best_next_auto_position(self, empties, square_value) -> int:
+    def get_best_next_auto_position(self, square_value) -> int:
         opponents_value = Tic_Tac_Toe_Board.x_square \
             if square_value == Tic_Tac_Toe_Board.o_square else \
                 Tic_Tac_Toe_Board.o_square
         # try to win
-        position = self.find_best_empty_with_2_1_match(square_value,\
-            Tic_Tac_Toe_Board.empty_square)
-        if position != None: return position
-        # avoid defeat
-        position = self.find_best_empty_with_2_1_match(opponents_value,\
-            Tic_Tac_Toe_Board.empty_square)
-        if position != None: return position
-        # pick more favorable position if there is one
-        position = self.find_best_empty_with_2_1_match( \
+        position = self.find_empty_with_1_2_match(
             Tic_Tac_Toe_Board.empty_square, square_value)
         if position != None: return position
+        # avoid defeat
+        position = self.find_empty_with_1_2_match(
+            Tic_Tac_Toe_Board.empty_square, opponents_value)
+        if position != None: return position
+        # pick more favorable position if there is one
+        position = self.find_empty_with_1_2_match( \
+            square_value, Tic_Tac_Toe_Board.empty_square)
+        if position != None: return position
         # prefer an empty corner
-        pick_list = [i for i in empties if i in Tic_Tac_Toe_Board.__corners]
+        pick_list = [i for i in Tic_Tac_Toe_Board.__corners \
+            if self.__board[i] == Tic_Tac_Toe_Board.empty_square]
         if len(pick_list) == 0:
             # any other empty will do
-            pick_list = empties
+            pick_list = [i for i in range(self.__num_squares) \
+                if self.__board[i] == Tic_Tac_Toe_Board.empty_square]
         position = random.choice(pick_list)
         return position
     
-    def find_best_empty_with_2_1_match(self, value1, value2) -> int:
+    def find_empty_with_1_2_match(self, value1, value2) -> int:
         position = None
         
         def matches(board, start, step):
-            count1 = sum(1 for i in range(start, start + (step * 3), step) \
+            end = start + (step * 3)
+            count1 = sum(1 for i in range(start, end, step) \
                 if board[i] == value1)
-            count2 = sum(1 for i in range(start, start + (step * 3), step) \
+            count2 = sum(1 for i in range(start, end, step) \
                 if board[i] == value2)
-            return count1 == 2 and count2 == 1
+            return count1 == 1 and count2 == 2
         
         line_params = self.find_line(matches)
         if line_params:
