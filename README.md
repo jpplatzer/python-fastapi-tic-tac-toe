@@ -8,9 +8,9 @@ Some tradeoffs were made for the sake of simplicity and expediency:
 
 * The App is implemented with server-side HTML rendering rather than a client-side web application using something like React.
 * It could be implemented more simply using a client-side Javascript implementation, but the purpose was to get some experience with Fastapi.
-* Because server-side HTML rendering is used, the API relies on the Get method rather than on the full set of API methods, e.g. Post, Put, Delete.
-* Authentication and authorization are not implemented
-* Multi-player is only available on a single browser screen
+* Because server-side only HTML rendering is used, the API relies on Get methods rather than on a CRUD interface with Get, Post, Put, and Delete methods.
+* Authentication and authorization are not implemented.
+* Multi-player functionality is not implemented.
 
 ---
 
